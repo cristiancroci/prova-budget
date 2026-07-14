@@ -12,17 +12,16 @@
     <!-- HEADER -->
     <header class="header">
       <div class="logo-wrap">
-        <div class="logo-icon">
-          <span class="logo-dot"></span>
-        </div>
+        <div class="logo-icon"><span class="logo-dot"></span></div>
         <div class="logo-text">BudgetFlow</div>
       </div>
       <div class="profile-circle"></div>
     </header>
 
-    <!-- HOME -->
+    <!-- HOME SCREEN -->
     <main class="screen screen-home active">
-      <!-- CARD ENTRATE / BUDGET -->
+
+      <!-- ENTRATE / BUDGET -->
       <section class="card income-card">
         <div class="section-title">Imposta entrate mensili</div>
 
@@ -40,18 +39,9 @@
         <div class="field">
           <span>Regola 50 / 30 / 20</span>
           <div class="rule-row">
-            <div class="rule-item">
-              <span>Necessità (50%)</span>
-              <strong id="nec-val">€ 0</strong>
-            </div>
-            <div class="rule-item">
-              <span>Desideri (30%)</span>
-              <strong id="des-val">€ 0</strong>
-            </div>
-            <div class="rule-item">
-              <span>Risparmio (20%)</span>
-              <strong id="ris-val">€ 0</strong>
-            </div>
+            <div class="rule-item"><span>Necessità (50%)</span><strong id="nec-val">€ 0</strong></div>
+            <div class="rule-item"><span>Desideri (30%)</span><strong id="des-val">€ 0</strong></div>
+            <div class="rule-item"><span>Risparmio (20%)</span><strong id="ris-val">€ 0</strong></div>
           </div>
         </div>
 
@@ -70,6 +60,7 @@
             <canvas id="ringCanvas" width="120" height="120"></canvas>
             <div class="ring-inner" id="ring-text">50 / 30 / 20</div>
           </div>
+
           <div class="ring-legend">
             <div><span class="dot nec"></span>Necessità <span id="nec-perc">0%</span></div>
             <div><span class="dot des"></span>Desideri <span id="des-perc">0%</span></div>
@@ -79,57 +70,41 @@
 
         <div class="main-progress">
           <div class="progress-label">Budget usato</div>
-          <div class="progress-bar">
-            <div class="progress-fill" id="budget-fill" style="width: 0%;"></div>
-          </div>
+          <div class="progress-bar"><div class="progress-fill" id="budget-fill"></div></div>
           <div class="progress-meta" id="budget-meta">0% del budget mensile</div>
         </div>
 
         <div class="summary-progress">
           <div class="summary-progress-label">Rimasto</div>
-          <div class="summary-progress-bar">
-            <div class="summary-progress-fill" id="left-fill" style="width: 100%;"></div>
-          </div>
+          <div class="summary-progress-bar"><div class="summary-progress-fill" id="left-fill"></div></div>
           <div class="summary-progress-meta" id="left-meta">€ 0,00 rimasti</div>
         </div>
       </section>
 
-      <!-- MINI CARD CATEGORIE -->
+      <!-- CATEGORIE -->
       <section class="card categories-card">
         <div class="cat-item entry-Necessità">
           <div class="cat-top">
-            <span class="cat-label">
-              <span class="icon-pill nec-icon"></span>Necessità
-            </span>
+            <span class="cat-label"><span class="icon-pill nec-icon"></span>Necessità</span>
             <span class="cat-amount" id="cat-nec-amount">€ 0</span>
           </div>
-          <div class="cat-bar">
-            <div class="cat-fill nec" id="cat-nec-fill" style="width: 0%;"></div>
-          </div>
+          <div class="cat-bar"><div class="cat-fill nec" id="cat-nec-fill"></div></div>
         </div>
 
         <div class="cat-item entry-Desideri">
           <div class="cat-top">
-            <span class="cat-label">
-              <span class="icon-pill des-icon"></span>Desideri
-            </span>
+            <span class="cat-label"><span class="icon-pill des-icon"></span>Desideri</span>
             <span class="cat-amount" id="cat-des-amount">€ 0</span>
           </div>
-          <div class="cat-bar">
-            <div class="cat-fill des" id="cat-des-fill" style="width: 0%;"></div>
-          </div>
+          <div class="cat-bar"><div class="cat-fill des" id="cat-des-fill"></div></div>
         </div>
 
         <div class="cat-item entry-Risparmio">
           <div class="cat-top">
-            <span class="cat-label">
-              <span class="icon-pill ris-icon"></span>Risparmio
-            </span>
+            <span class="cat-label"><span class="icon-pill ris-icon"></span>Risparmio</span>
             <span class="cat-amount" id="cat-ris-amount">€ 0</span>
           </div>
-          <div class="cat-bar">
-            <div class="cat-fill ris" id="cat-ris-fill" style="width: 0%;"></div>
-          </div>
+          <div class="cat-bar"><div class="cat-fill ris" id="cat-ris-fill"></div></div>
         </div>
       </section>
 
@@ -159,6 +134,7 @@
             <option value="Desideri">Desideri</option>
             <option value="Risparmio">Risparmio</option>
           </select>
+
           <input type="number" id="history-min" placeholder="Min €" oninput="loadHistory()">
           <input type="number" id="history-max" placeholder="Max €" oninput="loadHistory()">
         </div>
@@ -169,12 +145,12 @@
 
   </div>
 
-  <!-- OVERLAY BANNER -->
+  <!-- BANNER -->
   <div class="overlay-banner" id="overlay-banner">
     <span id="overlay-title">Aggiungi spesa</span>
   </div>
 
-  <!-- OVERLAY AGGIUNGI SPESA -->
+  <!-- OVERLAY AGGIUNGI -->
   <div class="overlay" id="overlay-add">
     <div class="overlay-card">
       <div class="overlay-header">
@@ -183,15 +159,8 @@
       </div>
 
       <div class="overlay-body">
-        <label class="field">
-          <span>Importo</span>
-          <input type="number" id="add-amount" placeholder="€ 0,00">
-        </label>
-
-        <label class="field">
-          <span>Descrizione</span>
-          <input type="text" id="add-desc" placeholder="Es. Spesa supermercato">
-        </label>
+        <label class="field"><span>Importo</span><input type="number" id="add-amount"></label>
+        <label class="field"><span>Descrizione</span><input type="text" id="add-desc"></label>
 
         <div class="field">
           <span>Categoria</span>
@@ -202,10 +171,7 @@
           </div>
         </div>
 
-        <label class="field">
-          <span>Data</span>
-          <input type="date" id="add-date">
-        </label>
+        <label class="field"><span>Data</span><input type="date" id="add-date"></label>
       </div>
 
       <div class="overlay-footer">
@@ -214,7 +180,7 @@
     </div>
   </div>
 
-  <!-- OVERLAY MODIFICA SPESA -->
+  <!-- OVERLAY MODIFICA -->
   <div class="overlay" id="overlay-edit">
     <div class="overlay-card">
       <div class="overlay-header">
@@ -223,15 +189,8 @@
       </div>
 
       <div class="overlay-body">
-        <label class="field">
-          <span>Importo</span>
-          <input type="number" id="edit-amount">
-        </label>
-
-        <label class="field">
-          <span>Descrizione</span>
-          <input type="text" id="edit-desc">
-        </label>
+        <label class="field"><span>Importo</span><input type="number" id="edit-amount"></label>
+        <label class="field"><span>Descrizione</span><input type="text" id="edit-desc"></label>
 
         <div class="field">
           <span>Categoria</span>
@@ -242,10 +201,7 @@
           </div>
         </div>
 
-        <label class="field">
-          <span>Data</span>
-          <input type="date" id="edit-date">
-        </label>
+        <label class="field"><span>Data</span><input type="date" id="edit-date"></label>
       </div>
 
       <div class="overlay-footer">
@@ -274,15 +230,9 @@
 
   <!-- TAB BAR -->
   <nav class="tabbar">
-    <button class="tab-btn active" onclick="showScreen('home')">
-      <span class="tab-icon">🏠</span>
-      <span class="tab-label">Home</span>
-    </button>
+    <button class="tab-btn active" onclick="showScreen('home')"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></button>
     <button class="fab-btn" onclick="openOverlay('overlay-add')">＋</button>
-    <button class="tab-btn" onclick="showScreen('history')">
-      <span class="tab-icon">📜</span>
-      <span class="tab-label">Storico</span>
-    </button>
+    <button class="tab-btn" onclick="showScreen('history')"><span class="tab-icon">📜</span><span class="tab-label">Storico</span></button>
   </nav>
 
   <script src="script.js"></script>
