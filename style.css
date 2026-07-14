@@ -11,6 +11,7 @@
   --ris:#00c96b;
 }
 
+/* RESET */
 *{
   box-sizing:border-box;
   margin:0;
@@ -343,7 +344,6 @@ body{
   width:16px;
   height:16px;
   border-radius:999px;
-  background:rgba(0,0,0,0.06);
 }
 
 .nec-icon{background:linear-gradient(135deg,var(--nec),#ff9b9b);}
