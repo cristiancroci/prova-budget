@@ -1,8 +1,14 @@
+/* ============================
+   VARIABILI GLOBALI
+============================ */
 let addCat = null;
 let editCat = null;
 let editIndex = null;
 let deleteIndex = null;
 
+/* ============================
+   CAMBIO SCHERMATA
+============================ */
 function showScreen(which){
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelector('.screen-' + which).classList.add('active');
@@ -15,13 +21,18 @@ function showScreen(which){
   if(which === 'history') loadHistory();
 }
 
+/* ============================
+   OVERLAY + BANNER
+============================ */
 function openOverlay(id){
   document.getElementById(id).classList.add('show');
+
   const banner = document.getElementById('overlay-banner');
   const title = id === "overlay-add" ? "Aggiungi spesa" :
                 id === "overlay-edit" ? "Modifica spesa" :
                 id === "overlay-delete" ? "Elimina voce" : "";
   document.getElementById("overlay-title").textContent = title;
+
   banner.classList.add('show');
 }
 
@@ -30,6 +41,9 @@ function closeOverlay(id){
   document.getElementById('overlay-banner').classList.remove('show');
 }
 
+/* ============================
+   SELEZIONE CATEGORIA
+============================ */
 function selectAddCat(btn){
   document.querySelectorAll('#overlay-add .cat-pill').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
@@ -42,17 +56,26 @@ function selectEditCat(btn){
   editCat = btn.dataset.cat;
 }
 
+/* ============================
+   FORMATTAZIONE EURO
+============================ */
 function formatEuro(val){
   if(isNaN(val) || val === null) return "€ 0,00";
   return "€ " + val.toFixed(2).replace(".", ",");
 }
 
+/* ============================
+   CHIAVI MESE
+============================ */
 function getMonthKey(offset = 0){
   const d = new Date();
   d.setMonth(d.getMonth() + offset);
   return d.getFullYear() + "_" + (d.getMonth()+1);
 }
 
+/* ============================
+   LETTURA / SCRITTURA SPESE
+============================ */
 function getSpese(key){
   return JSON.parse(localStorage.getItem("spese_" + key) || "[]");
 }
@@ -61,6 +84,9 @@ function setSpese(key, arr){
   localStorage.setItem("spese_" + key, JSON.stringify(arr));
 }
 
+/* ============================
+   AGGIUNTA NUOVA SPESA
+============================ */
 function saveNewSpesa(){
   const amount = parseFloat(document.getElementById('add-amount').value || "0");
   const desc = document.getElementById('add-desc').value || "";
@@ -80,12 +106,17 @@ function saveNewSpesa(){
   animateLastEntry();
 }
 
+/* ============================
+   MODIFICA SPESA
+============================ */
 function openEdit(desc, amount, cat, index){
   editIndex = index;
   openOverlay('overlay-edit');
+
   document.getElementById('edit-desc').value = desc;
   document.getElementById('edit-amount').value = amount;
   document.getElementById('edit-date').value = "";
+
   editCat = cat;
   document.querySelectorAll('#overlay-edit .cat-pill').forEach(b => {
     b.classList.toggle('active', b.dataset.cat === cat);
@@ -94,6 +125,7 @@ function openEdit(desc, amount, cat, index){
 
 function saveEditSpesa(){
   if(editIndex === null) return;
+
   const key = getMonthKey();
   const arr = getSpese(key);
 
@@ -112,6 +144,9 @@ function saveEditSpesa(){
   updateTotals();
 }
 
+/* ============================
+   ELIMINA SPESA
+============================ */
 function openDelete(desc, index){
   deleteIndex = index;
   document.getElementById('delete-text').textContent =
@@ -121,19 +156,26 @@ function openDelete(desc, index){
 
 function confirmDelete(){
   if(deleteIndex === null) return;
+
   const key = getMonthKey();
   const arr = getSpese(key);
+
   arr.splice(deleteIndex, 1);
   setSpese(key, arr);
+
   deleteIndex = null;
   closeOverlay('overlay-delete');
   renderRecent();
   updateTotals();
 }
 
+/* ============================
+   CALCOLO BUDGET
+============================ */
 function calcBudget(){
   const income = parseFloat(document.getElementById('income').value || "0");
   let budget = parseFloat(document.getElementById('budget').value || "0");
+
   if(budget <= 0) budget = income;
 
   const nec = budget * 0.5;
@@ -153,6 +195,9 @@ function calcBudget(){
   updateTotals();
 }
 
+/* ============================
+   AGGIORNA TOTALE / GRAFICO
+============================ */
 function updateTotals(){
   const key = getMonthKey();
   const budget = parseFloat(localStorage.getItem("budget_" + key) || "0");
@@ -203,6 +248,9 @@ function updateTotals(){
   drawRing(necPerc, desPerc, risPerc);
 }
 
+/* ============================
+   RENDER ULTIME SPESE
+============================ */
 function renderRecent(){
   const key = getMonthKey();
   const arr = getSpese(key);
@@ -211,8 +259,10 @@ function renderRecent(){
 
   arr.slice().reverse().forEach((s, idxRev) => {
     const idx = arr.length - 1 - idxRev;
+
     const div = document.createElement('div');
     div.className = "entry entry-" + s.cat;
+
     div.innerHTML = `
       <div class="entry-main">
         <div class="entry-desc">${s.desc}</div>
@@ -224,16 +274,23 @@ function renderRecent(){
         ${s.cat} • ${s.date || "Data non impostata"}
       </div>
     `;
+
     container.appendChild(div);
   });
 }
 
+/* ============================
+   ANIMAZIONE NUOVA SPESA
+============================ */
 function animateLastEntry(){
   const container = document.getElementById('recent-list');
   const first = container.firstElementChild;
   if(first) first.classList.add('entry-added');
 }
 
+/* ============================
+   STORICO + FILTRI
+============================ */
 function loadHistory(){
   const monthSel = document.getElementById('history-month').value;
   const catSel = document.getElementById('history-category').value;
@@ -255,6 +312,7 @@ function loadHistory(){
 
     const div = document.createElement('div');
     div.className = "entry entry-" + s.cat;
+
     div.innerHTML = `
       <div class="entry-main">
         <div class="entry-desc">${s.desc}</div>
@@ -266,14 +324,18 @@ function loadHistory(){
         ${s.cat} • ${s.date || "Data non impostata"}
       </div>
     `;
+
     container.appendChild(div);
   });
 }
 
-/* GRAFICO DINAMICO CANVAS */
+/* ============================
+   GRAFICO DINAMICO CANVAS
+============================ */
 function drawRing(necPerc, desPerc, risPerc){
   const canvas = document.getElementById('ringCanvas');
   if(!canvas) return;
+
   const ctx = canvas.getContext('2d');
   const cx = canvas.width / 2;
   const cy = canvas.height / 2;
@@ -310,6 +372,9 @@ function drawRing(necPerc, desPerc, risPerc){
   ctx.stroke();
 }
 
+/* ============================
+   AVVIO
+============================ */
 document.addEventListener('DOMContentLoaded', () => {
   renderRecent();
   updateTotals();
