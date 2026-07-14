@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
   <div class="app">
 
@@ -30,6 +31,7 @@
             <span>Entrate mensili</span>
             <input type="number" id="income" placeholder="Es. 2000">
           </label>
+
           <label class="field">
             <span>Budget mensile</span>
             <input type="number" id="budget" placeholder="Es. 1800">
@@ -58,7 +60,7 @@
         <div class="main-middle">
           <div class="ring-chart">
             <canvas id="ringCanvas" width="120" height="120"></canvas>
-            <div class="ring-inner" id="ring-text">50 / 30 / 20</div>
+            <div class="ring-inner" id="ring-text">Budget € 0</div>
           </div>
 
           <div class="ring-legend">
@@ -83,6 +85,7 @@
 
       <!-- CATEGORIE -->
       <section class="card categories-card">
+
         <div class="cat-item entry-Necessità">
           <div class="cat-top">
             <span class="cat-label"><span class="icon-pill nec-icon"></span>Necessità</span>
@@ -106,6 +109,7 @@
           </div>
           <div class="cat-bar"><div class="cat-fill ris" id="cat-ris-fill"></div></div>
         </div>
+
       </section>
 
       <!-- ULTIME SPESE -->
@@ -113,6 +117,7 @@
         <div class="section-title glow-text">Ultime spese</div>
         <div id="recent-list"></div>
       </section>
+
     </main>
 
     <!-- STORICO -->
@@ -230,9 +235,17 @@
 
   <!-- TAB BAR -->
   <nav class="tabbar">
-    <button class="tab-btn active" onclick="showScreen('home')"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></button>
+    <button class="tab-btn active" onclick="showScreen('home')">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">Home</span>
+    </button>
+
     <button class="fab-btn" onclick="openOverlay('overlay-add')">＋</button>
-    <button class="tab-btn" onclick="showScreen('history')"><span class="tab-icon">📜</span><span class="tab-label">Storico</span></button>
+
+    <button class="tab-btn" onclick="showScreen('history')">
+      <span class="tab-icon">📜</span>
+      <span class="tab-label">Storico</span>
+    </button>
   </nav>
 
   <script src="script.js"></script>
