@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <title>BudgetFlow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style-mockup.css">
+</head>
+<body>
+  <div class="app">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="logo">BudgetFlow</div>
+      <div class="profile-circle"></div>
+    </header>
+
+    <!-- HOME (DASHBOARD) -->
+    <main class="screen screen-home active">
+      <!-- CARD PRINCIPALE -->
+      <section class="card main-card">
+        <div class="main-top">
+          <div class="main-label">Spese mese corrente</div>
+          <div class="main-amount">€ 1.245,00</div>
+        </div>
+
+        <div class="main-middle">
+          <div class="ring-chart">
+            <div class="ring-inner">50 / 30 / 20</div>
+          </div>
+          <div class="ring-legend">
+            <div><span class="dot nec"></span>Necessità 52%</div>
+            <div><span class="dot des"></span>Desideri 28%</div>
+            <div><span class="dot ris"></span>Risparmio 20%</div>
+          </div>
+        </div>
+
+        <div class="main-progress">
+          <div class="progress-label">Budget usato</div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 68%;"></div>
+          </div>
+          <div class="progress-meta">68% del budget mensile</div>
+        </div>
+      </section>
+
+      <!-- MINI CARD CATEGORIE -->
+      <section class="card categories-card">
+        <div class="cat-item">
+          <div class="cat-top">
+            <span class="cat-label">Necessità</span>
+            <span class="cat-amount">€ 650</span>
+          </div>
+          <div class="cat-bar">
+            <div class="cat-fill nec" style="width: 52%;"></div>
+          </div>
+        </div>
+
+        <div class="cat-item">
+          <div class="cat-top">
+            <span class="cat-label">Desideri</span>
+            <span class="cat-amount">€ 350</span>
+          </div>
+          <div class="cat-bar">
+            <div class="cat-fill des" style="width: 28%;"></div>
+          </div>
+        </div>
+
+        <div class="cat-item">
+          <div class="cat-top">
+            <span class="cat-label">Risparmio</span>
+            <span class="cat-amount">€ 245</span>
+          </div>
+          <div class="cat-bar">
+            <div class="cat-fill ris" style="width: 20%;"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ULTIME SPESE -->
+      <section class="card recent-card">
+        <div class="section-title">Ultime spese</div>
+
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-desc">Spesa supermercato</div>
+            <div class="entry-amount">€ 54,90</div>
+          </div>
+          <div class="entry-meta">
+            Necessità • 12 Luglio 2026 • 18:32
+          </div>
+        </div>
+
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-desc">Cena fuori</div>
+            <div class="entry-amount">€ 32,00</div>
+          </div>
+          <div class="entry-meta">
+            Desideri • 11 Luglio 2026 • 21:10
+          </div>
+        </div>
+
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-desc">Versamento risparmio</div>
+            <div class="entry-amount">€ 100,00</div>
+          </div>
+          <div class="entry-meta">
+            Risparmio • 10 Luglio 2026 • 09:05
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- STORICO -->
+    <main class="screen screen-history">
+      <section class="card">
+        <div class="section-title">Storico spese</div>
+
+        <div class="history-filter">
+          <select>
+            <option>Mese corrente</option>
+            <option>Giugno 2026</option>
+            <option>Maggio 2026</option>
+          </select>
+        </div>
+
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-desc">Affitto</div>
+            <div class="entry-amount">€ 500,00</div>
+          </div>
+          <div class="entry-meta">
+            Necessità • 01 Luglio 2026 • 09:00
+          </div>
+        </div>
+
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-desc">Abbonamento streaming</div>
+            <div class="entry-amount">€ 14,99</div>
+          </div>
+          <div class="entry-meta">
+            Desideri • 03 Luglio 2026 • 20:15
+          </div>
+        </div>
+
+        <div class="entry">
+          <div class="entry-main">
+            <div class="entry-desc">Risparmio automatico</div>
+            <div class="entry-amount">€ 150,00</div>
+          </div>
+          <div class="entry-meta">
+            Risparmio • 05 Luglio 2026 • 08:30
+          </div>
+        </div>
+      </section>
+    </main>
+
+  </div>
+
+  <!-- OVERLAY AGGIUNGI SPESA -->
+  <div class="overlay" id="overlay-add">
+    <div class="overlay-card">
+      <div class="overlay-header">
+        <span>Aggiungi spesa</span>
+        <button class="overlay-close" onclick="document.getElementById('overlay-add').classList.remove('show')">✕</button>
+      </div>
+
+      <div class="overlay-body">
+        <label class="field">
+          <span>Importo</span>
+          <input type="number" placeholder="€ 0,00">
+        </label>
+
+        <label class="field">
+          <span>Descrizione</span>
+          <input type="text" placeholder="Es. Spesa supermercato">
+        </label>
+
+        <div class="field">
+          <span>Categoria</span>
+          <div class="cat-chooser">
+            <button class="cat-pill nec">Necessità</button>
+            <button class="cat-pill des">Desideri</button>
+            <button class="cat-pill ris">Risparmio</button>
+          </div>
+        </div>
+
+        <label class="field">
+          <span>Data</span>
+          <input type="date">
+        </label>
+      </div>
+
+      <div class="overlay-footer">
+        <button class="primary-btn">Salva spesa</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB BAR -->
+  <nav class="tabbar">
+    <button class="tab-btn active" onclick="showScreen('home')">
+      <span class="tab-icon">🏠</span>
+      <span class="tab-label">Home</span>
+    </button>
+    <button class="fab-btn" onclick="document.getElementById('overlay-add').classList.add('show')">＋</button>
+    <button class="tab-btn" onclick="showScreen('history')">
+      <span class="tab-icon">📜</span>
+      <span class="tab-label">Storico</span>
+    </button>
+  </nav>
+
+  <script>
+    function showScreen(which){
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+      document.querySelector('.screen-' + which).classList.add('active');
+
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      if(which === 'home'){
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      }else{
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      }
+    }
+  </script>
+</body>
+</html>
