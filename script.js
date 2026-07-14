@@ -229,10 +229,26 @@ function updateTotals(){
   document.getElementById('left-meta').textContent =
     formatEuro(Math.max(0, leftVal)) + " rimasti";
 
-  const totalCat = necTotal + desTotal + risTotal || 1;
-  const necPerc = (necTotal / totalCat) * 100;
-  const desPerc = (desTotal / totalCat) * 100;
-  const risPerc = (risTotal / totalCat) * 100;
+  /* NORMALIZZAZIONE GRAFICO */
+  let necPerc = necTotal;
+  let desPerc = desTotal;
+  let risPerc = risTotal;
+
+  const sum = necPerc + desPerc + risPerc || 1;
+
+  necPerc = (necPerc / sum) * 100;
+  desPerc = (desPerc / sum) * 100;
+  risPerc = (risPerc / sum) * 100;
+
+  /* MINIMO VISIVO */
+  necPerc = Math.max(necPerc, 5);
+  desPerc = Math.max(desPerc, 5);
+  risPerc = Math.max(risPerc, 5);
+
+  const sum2 = necPerc + desPerc + risPerc;
+  necPerc = necPerc / sum2 * 100;
+  desPerc = desPerc / sum2 * 100;
+  risPerc = risPerc / sum2 * 100;
 
   document.getElementById('nec-perc').textContent = necPerc.toFixed(0) + "%";
   document.getElementById('des-perc').textContent = desPerc.toFixed(0) + "%";
@@ -344,10 +360,9 @@ function drawRing(necPerc, desPerc, risPerc){
 
   ctx.clearRect(0,0,canvas.width,canvas.height);
 
-  const total = necPerc + desPerc + risPerc || 1;
-  const necAngle = (necPerc / total) * Math.PI * 2;
-  const desAngle = (desPerc / total) * Math.PI * 2;
-  const risAngle = (risPerc / total) * Math.PI * 2;
+  const necAngle = (necPerc / 100) * Math.PI * 2;
+  const desAngle = (desPerc / 100) * Math.PI * 2;
+  const risAngle = (risPerc / 100) * Math.PI * 2;
 
   let start = -Math.PI / 2;
 
