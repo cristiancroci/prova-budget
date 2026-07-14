@@ -11,7 +11,12 @@
 
     <!-- HEADER -->
     <header class="header">
-      <div class="logo">BudgetFlow</div>
+      <div class="logo-wrap">
+        <div class="logo-icon">
+          <span class="logo-dot"></span>
+        </div>
+        <div class="logo-text">BudgetFlow</div>
+      </div>
       <div class="profile-circle"></div>
     </header>
 
@@ -57,34 +62,35 @@
       <section class="card main-card">
         <div class="main-top">
           <div class="main-label">Spese mese corrente</div>
-          <div class="main-amount" id="spent-total">€ 1.245,00</div>
+          <div class="main-amount" id="spent-total">€ 0,00</div>
         </div>
 
         <div class="main-middle">
           <div class="ring-chart">
+            <canvas id="ringCanvas" width="120" height="120"></canvas>
             <div class="ring-inner" id="ring-text">50 / 30 / 20</div>
           </div>
           <div class="ring-legend">
-            <div><span class="dot nec"></span>Necessità <span id="nec-perc">52%</span></div>
-            <div><span class="dot des"></span>Desideri <span id="des-perc">28%</span></div>
-            <div><span class="dot ris"></span>Risparmio <span id="ris-perc">20%</span></div>
+            <div><span class="dot nec"></span>Necessità <span id="nec-perc">0%</span></div>
+            <div><span class="dot des"></span>Desideri <span id="des-perc">0%</span></div>
+            <div><span class="dot ris"></span>Risparmio <span id="ris-perc">0%</span></div>
           </div>
         </div>
 
         <div class="main-progress">
           <div class="progress-label">Budget usato</div>
           <div class="progress-bar">
-            <div class="progress-fill" id="budget-fill" style="width: 68%;"></div>
+            <div class="progress-fill" id="budget-fill" style="width: 0%;"></div>
           </div>
-          <div class="progress-meta" id="budget-meta">68% del budget mensile</div>
+          <div class="progress-meta" id="budget-meta">0% del budget mensile</div>
         </div>
 
         <div class="summary-progress">
           <div class="summary-progress-label">Rimasto</div>
           <div class="summary-progress-bar">
-            <div class="summary-progress-fill" id="left-fill" style="width: 32%;"></div>
+            <div class="summary-progress-fill" id="left-fill" style="width: 100%;"></div>
           </div>
-          <div class="summary-progress-meta" id="left-meta">€ 855,00 rimasti</div>
+          <div class="summary-progress-meta" id="left-meta">€ 0,00 rimasti</div>
         </div>
       </section>
 
@@ -92,31 +98,37 @@
       <section class="card categories-card">
         <div class="cat-item entry-Necessità">
           <div class="cat-top">
-            <span class="cat-label">Necessità</span>
-            <span class="cat-amount" id="cat-nec-amount">€ 650</span>
+            <span class="cat-label">
+              <span class="icon-pill nec-icon"></span>Necessità
+            </span>
+            <span class="cat-amount" id="cat-nec-amount">€ 0</span>
           </div>
           <div class="cat-bar">
-            <div class="cat-fill nec" id="cat-nec-fill" style="width: 52%;"></div>
+            <div class="cat-fill nec" id="cat-nec-fill" style="width: 0%;"></div>
           </div>
         </div>
 
         <div class="cat-item entry-Desideri">
           <div class="cat-top">
-            <span class="cat-label">Desideri</span>
-            <span class="cat-amount" id="cat-des-amount">€ 350</span>
+            <span class="cat-label">
+              <span class="icon-pill des-icon"></span>Desideri
+            </span>
+            <span class="cat-amount" id="cat-des-amount">€ 0</span>
           </div>
           <div class="cat-bar">
-            <div class="cat-fill des" id="cat-des-fill" style="width: 28%;"></div>
+            <div class="cat-fill des" id="cat-des-fill" style="width: 0%;"></div>
           </div>
         </div>
 
         <div class="cat-item entry-Risparmio">
           <div class="cat-top">
-            <span class="cat-label">Risparmio</span>
-            <span class="cat-amount" id="cat-ris-amount">€ 245</span>
+            <span class="cat-label">
+              <span class="icon-pill ris-icon"></span>Risparmio
+            </span>
+            <span class="cat-amount" id="cat-ris-amount">€ 0</span>
           </div>
           <div class="cat-bar">
-            <div class="cat-fill ris" id="cat-ris-fill" style="width: 20%;"></div>
+            <div class="cat-fill ris" id="cat-ris-fill" style="width: 0%;"></div>
           </div>
         </div>
       </section>
@@ -124,42 +136,7 @@
       <!-- ULTIME SPESE -->
       <section class="card recent-card">
         <div class="section-title glow-text">Ultime spese</div>
-
-        <div class="entry entry-Necessità">
-          <div class="entry-main">
-            <div class="entry-desc">Spesa supermercato</div>
-            <div class="entry-amount">€ 54,90</div>
-            <span class="entry-edit" onclick="openEdit('Spesa supermercato','54.90','Necessità')">✎</span>
-            <span class="entry-delete" onclick="openDelete('Spesa supermercato')">🗑</span>
-          </div>
-          <div class="entry-meta">
-            Necessità • 12 Luglio 2026 • 18:32
-          </div>
-        </div>
-
-        <div class="entry entry-Desideri">
-          <div class="entry-main">
-            <div class="entry-desc">Cena fuori</div>
-            <div class="entry-amount">€ 32,00</div>
-            <span class="entry-edit" onclick="openEdit('Cena fuori','32.00','Desideri')">✎</span>
-            <span class="entry-delete" onclick="openDelete('Cena fuori')">🗑</span>
-          </div>
-          <div class="entry-meta">
-            Desideri • 11 Luglio 2026 • 21:10
-          </div>
-        </div>
-
-        <div class="entry entry-Risparmio">
-          <div class="entry-main">
-            <div class="entry-desc">Versamento risparmio</div>
-            <div class="entry-amount">€ 100,00</div>
-            <span class="entry-edit" onclick="openEdit('Versamento risparmio','100.00','Risparmio')">✎</span>
-            <span class="entry-delete" onclick="openDelete('Versamento risparmio')">🗑</span>
-          </div>
-          <div class="entry-meta">
-            Risparmio • 10 Luglio 2026 • 09:05
-          </div>
-        </div>
+        <div id="recent-list"></div>
       </section>
     </main>
 
@@ -169,51 +146,32 @@
         <div class="section-title glow-text">Storico spese</div>
 
         <div class="history-filter">
-          <select>
-            <option>Mese corrente</option>
-            <option>Giugno 2026</option>
-            <option>Maggio 2026</option>
+          <select id="history-month" onchange="loadHistory()">
+            <option value="current">Mese corrente</option>
+            <option value="prev1">Mese precedente</option>
           </select>
         </div>
 
-        <div class="entry entry-Necessità">
-          <div class="entry-main">
-            <div class="entry-desc">Affitto</div>
-            <div class="entry-amount">€ 500,00</div>
-            <span class="entry-edit" onclick="openEdit('Affitto','500.00','Necessità')">✎</span>
-            <span class="entry-delete" onclick="openDelete('Affitto')">🗑</span>
-          </div>
-          <div class="entry-meta">
-            Necessità • 01 Luglio 2026 • 09:00
-          </div>
+        <div class="history-filter-row">
+          <select id="history-category" onchange="loadHistory()">
+            <option value="all">Tutte le categorie</option>
+            <option value="Necessità">Necessità</option>
+            <option value="Desideri">Desideri</option>
+            <option value="Risparmio">Risparmio</option>
+          </select>
+          <input type="number" id="history-min" placeholder="Min €" oninput="loadHistory()">
+          <input type="number" id="history-max" placeholder="Max €" oninput="loadHistory()">
         </div>
 
-        <div class="entry entry-Desideri">
-          <div class="entry-main">
-            <div class="entry-desc">Abbonamento streaming</div>
-            <div class="entry-amount">€ 14,99</div>
-            <span class="entry-edit" onclick="openEdit('Abbonamento streaming','14.99','Desideri')">✎</span>
-            <span class="entry-delete" onclick="openDelete('Abbonamento streaming')">🗑</span>
-          </div>
-          <div class="entry-meta">
-            Desideri • 03 Luglio 2026 • 20:15
-          </div>
-        </div>
-
-        <div class="entry entry-Risparmio">
-          <div class="entry-main">
-            <div class="entry-desc">Risparmio automatico</div>
-            <div class="entry-amount">€ 150,00</div>
-            <span class="entry-edit" onclick="openEdit('Risparmio automatico','150.00','Risparmio')">✎</span>
-            <span class="entry-delete" onclick="openDelete('Risparmio automatico')">🗑</span>
-          </div>
-          <div class="entry-meta">
-            Risparmio • 05 Luglio 2026 • 08:30
-          </div>
-        </div>
+        <div id="history-list"></div>
       </section>
     </main>
 
+  </div>
+
+  <!-- OVERLAY BANNER -->
+  <div class="overlay-banner" id="overlay-banner">
+    <span id="overlay-title">Aggiungi spesa</span>
   </div>
 
   <!-- OVERLAY AGGIUNGI SPESA -->
@@ -238,9 +196,9 @@
         <div class="field">
           <span>Categoria</span>
           <div class="cat-chooser">
-            <button class="cat-pill nec">Necessità</button>
-            <button class="cat-pill des">Desideri</button>
-            <button class="cat-pill ris">Risparmio</button>
+            <button class="cat-pill nec" data-cat="Necessità" onclick="selectAddCat(this)">Necessità</button>
+            <button class="cat-pill des" data-cat="Desideri" onclick="selectAddCat(this)">Desideri</button>
+            <button class="cat-pill ris" data-cat="Risparmio" onclick="selectAddCat(this)">Risparmio</button>
           </div>
         </div>
 
@@ -251,7 +209,7 @@
       </div>
 
       <div class="overlay-footer">
-        <button class="primary-btn">Salva spesa</button>
+        <button class="primary-btn" onclick="saveNewSpesa()">Salva spesa</button>
       </div>
     </div>
   </div>
@@ -278,9 +236,9 @@
         <div class="field">
           <span>Categoria</span>
           <div class="cat-chooser">
-            <button class="cat-pill nec">Necessità</button>
-            <button class="cat-pill des">Desideri</button>
-            <button class="cat-pill ris">Risparmio</button>
+            <button class="cat-pill nec" data-cat="Necessità" onclick="selectEditCat(this)">Necessità</button>
+            <button class="cat-pill des" data-cat="Desideri" onclick="selectEditCat(this)">Desideri</button>
+            <button class="cat-pill ris" data-cat="Risparmio" onclick="selectEditCat(this)">Risparmio</button>
           </div>
         </div>
 
@@ -291,7 +249,7 @@
       </div>
 
       <div class="overlay-footer">
-        <button class="primary-btn">Salva modifiche</button>
+        <button class="primary-btn" onclick="saveEditSpesa()">Salva modifiche</button>
       </div>
     </div>
   </div>
@@ -309,7 +267,7 @@
       </div>
 
       <div class="overlay-footer">
-        <button class="danger-btn">Elimina</button>
+        <button class="danger-btn" onclick="confirmDelete()">Elimina</button>
       </div>
     </div>
   </div>
@@ -327,73 +285,6 @@
     </button>
   </nav>
 
-  <script>
-    function showScreen(which){
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.querySelector('.screen-' + which).classList.add('active');
-
-      const tabs = document.querySelectorAll('.tab-btn');
-      tabs.forEach(b => b.classList.remove('active'));
-      if(which === 'home') tabs[0].classList.add('active');
-      else tabs[1].classList.add('active');
-    }
-
-    function openOverlay(id){
-      document.getElementById(id).classList.add('show');
-    }
-    function closeOverlay(id){
-      document.getElementById(id).classList.remove('show');
-    }
-
-    function openEdit(desc, amount, cat){
-      openOverlay('overlay-edit');
-      document.getElementById('edit-desc').value = desc;
-      document.getElementById('edit-amount').value = amount;
-      // cat lo puoi usare per selezionare il pill giusto
-    }
-
-    function openDelete(desc){
-      document.getElementById('delete-text').textContent =
-        'Vuoi eliminare "' + desc + '"?';
-      openOverlay('overlay-delete');
-    }
-
-    function formatEuro(val){
-      if(isNaN(val) || val === null) return "€ 0";
-      return "€ " + val.toFixed(2).replace(".", ",");
-    }
-
-    function calcBudget(){
-      const income = parseFloat(document.getElementById('income').value || "0");
-      let budget = parseFloat(document.getElementById('budget').value || "0");
-      if(budget <= 0) budget = income;
-
-      const nec = budget * 0.5;
-      const des = budget * 0.3;
-      const ris = budget * 0.2;
-
-      document.getElementById('nec-val').textContent = formatEuro(nec);
-      document.getElementById('des-val').textContent = formatEuro(des);
-      document.getElementById('ris-val').textContent = formatEuro(ris);
-
-      document.getElementById('cat-nec-amount').textContent = formatEuro(nec);
-      document.getElementById('cat-des-amount').textContent = formatEuro(des);
-      document.getElementById('cat-ris-amount').textContent = formatEuro(ris);
-
-      document.getElementById('nec-perc').textContent = "50%";
-      document.getElementById('des-perc').textContent = "30%";
-      document.getElementById('ris-perc').textContent = "20%";
-      document.getElementById('ring-text').textContent = "Budget " + formatEuro(budget);
-
-      const usedPerc = 60;
-      document.getElementById('budget-fill').style.width = usedPerc + "%";
-      document.getElementById('budget-meta').textContent = usedPerc + "% del budget mensile";
-
-      const leftPerc = 100 - usedPerc;
-      const leftVal = budget * leftPerc / 100;
-      document.getElementById('left-fill').style.width = leftPerc + "%";
-      document.getElementById('left-meta').textContent = formatEuro(leftVal) + " rimasti";
-    }
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
