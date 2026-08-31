@@ -91,8 +91,19 @@ button{font-family:inherit;}
   font-size:12px; color:var(--text-dim);
   background:rgba(20,20,30,0.04);
   border:1px solid rgba(20,20,30,0.06);
-  padding:6px 12px; border-radius:100px;
+  padding:6px 10px; border-radius:100px;
+  white-space:nowrap;
 }
+.month-nav{display:flex; align-items:center; gap:4px;}
+.month-nav-btn{
+  width:24px; height:24px; border-radius:100px; flex-shrink:0;
+  border:1px solid rgba(20,20,30,0.06);
+  background:rgba(20,20,30,0.04);
+  color:var(--text-dim); font-size:15px; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+}
+.month-nav-btn:disabled{opacity:0.3; pointer-events:none;}
 .sync-btn{
   width:30px; height:30px; border-radius:100px;
   border:1px solid rgba(20,20,30,0.06);
@@ -376,11 +387,15 @@ button{font-family:inherit;}
       <div class="brand-mark">B</div>
       <div class="brand-name">BudgetMio</div>
     </div>
-    <div style="display:flex; align-items:center; gap:8px;">
+    <div style="display:flex; align-items:center; gap:6px;">
       <button class="sync-btn" id="syncBtn" aria-label="Sincronizza con Drive" title="Sincronizza con Drive">
         <span id="syncIcon">☁</span>
       </button>
-      <div class="month-pill" id="monthPill">—</div>
+      <div class="month-nav">
+        <button class="month-nav-btn" id="prevMonthBtn" aria-label="Mese precedente">‹</button>
+        <div class="month-pill" id="monthPill">—</div>
+        <button class="month-nav-btn" id="nextMonthBtn" aria-label="Mese successivo">›</button>
+      </div>
     </div>
   </div>
 
@@ -496,14 +511,26 @@ button{font-family:inherit;}
     const d = new Date();
     return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
   };
-  const monthLabel = () => {
-    const d = new Date();
+  const monthLabel = () => monthLabelFor(viewMonth);
+  const monthLabelFor = key => {
+    const [y,m] = key.split("-").map(Number);
+    const d = new Date(y, m-1, 1);
     const s = d.toLocaleDateString("it-IT", {month:"long", year:"numeric"});
     return s.charAt(0).toUpperCase() + s.slice(1);
+  };
+  const shiftMonth = (key, delta) => {
+    const [y,m] = key.split("-").map(Number);
+    const d = new Date(y, m-1+delta, 1);
+    return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
   };
   const fmt = n => "€" + (Math.round(n*100)/100).toLocaleString("it-IT", {minimumFractionDigits:2, maximumFractionDigits:2});
   const fmtShort = n => "€" + Math.round(n).toLocaleString("it-IT");
   const todayStr = () => new Date().toISOString().slice(0,10);
+  const defaultDateForView = () => {
+    if(viewMonth === CURRENT_MONTH) return todayStr();
+    const [y,m] = viewMonth.split("-").map(Number);
+    return y + "-" + String(m).padStart(2,"0") + "-01";
+  };
 
   function loadState(){
     try{
@@ -519,8 +546,9 @@ button{font-family:inherit;}
   }
 
   let state = loadState();
-  const mk = monthKey();
-  if(!state.months[mk]) state.months[mk] = {tx:[]};
+  let viewMonth = monthKey();
+  const CURRENT_MONTH = monthKey();
+  if(!state.months[viewMonth]) state.months[viewMonth] = {tx:[]};
 
   const els = {
     monthPill: document.getElementById("monthPill"),
@@ -553,7 +581,9 @@ button{font-family:inherit;}
     syncUrlInput: document.getElementById("syncUrlInput"),
     syncStatusText: document.getElementById("syncStatusText"),
     btnSyncSave: document.getElementById("btnSyncSave"),
-    btnSyncClear: document.getElementById("btnSyncClear")
+    btnSyncClear: document.getElementById("btnSyncClear"),
+    prevMonthBtn: document.getElementById("prevMonthBtn"),
+    nextMonthBtn: document.getElementById("nextMonthBtn")
   };
 
   let activeCat = "needs";
@@ -571,10 +601,11 @@ button{font-family:inherit;}
 
   function render(){
     els.monthPill.textContent = monthLabel();
+    els.nextMonthBtn.disabled = (viewMonth === CURRENT_MONTH);
     els.incomeInput.value = state.income || "";
 
     const income = Number(state.income) || 0;
-    const tx = state.months[mk].tx;
+    const tx = (state.months[viewMonth] && state.months[viewMonth].tx) || [];
 
     const spentByCat = {needs:0, wants:0, savings:0};
     tx.forEach(t => { spentByCat[t.cat] += t.amount; });
@@ -681,6 +712,16 @@ button{font-family:inherit;}
     render();
   });
 
+  els.prevMonthBtn.addEventListener("click", () => {
+    viewMonth = shiftMonth(viewMonth, -1);
+    render();
+  });
+  els.nextMonthBtn.addEventListener("click", () => {
+    if(viewMonth === CURRENT_MONTH) return;
+    viewMonth = shiftMonth(viewMonth, 1);
+    render();
+  });
+
   function setCatToggle(cat){
     activeCat = cat;
     [...els.catToggle.children].forEach(b => b.classList.toggle("active", b.dataset.c === cat));
@@ -692,7 +733,7 @@ button{font-family:inherit;}
     els.delLink.style.display = "none";
     els.txTitle.value = "";
     els.txAmount.value = "";
-    els.txDate.value = todayStr();
+    els.txDate.value = defaultDateForView();
     setCatToggle("needs");
     els.overlay.classList.add("open");
     els.sheet.classList.add("open");
@@ -700,7 +741,7 @@ button{font-family:inherit;}
   }
 
   function openSheetEdit(id){
-    const t = state.months[mk].tx.find(x => x.id === id);
+    const t = state.months[viewMonth].tx.find(x => x.id === id);
     if(!t) return;
     editingId = id;
     els.sheetTitle.textContent = "Modifica movimento";
@@ -736,15 +777,16 @@ button{font-family:inherit;}
     if(!amount || amount <= 0){ showToast("Inserisci un importo valido"); els.txAmount.focus(); return; }
 
     let ts = dateVal ? new Date(dateVal + "T12:00:00").getTime() : Date.now();
+    if(!state.months[viewMonth]) state.months[viewMonth] = {tx:[]};
 
     if(editingId){
-      const t = state.months[mk].tx.find(x => x.id === editingId);
+      const t = state.months[viewMonth].tx.find(x => x.id === editingId);
       if(t){
         t.title = title; t.amount = amount; t.cat = activeCat; t.ts = ts;
       }
       showToast("Movimento aggiornato");
     } else {
-      state.months[mk].tx.push({
+      state.months[viewMonth].tx.push({
         id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
         title, amount, cat: activeCat, ts
       });
@@ -757,7 +799,7 @@ button{font-family:inherit;}
 
   els.delLink.addEventListener("click", () => {
     if(!editingId) return;
-    state.months[mk].tx = state.months[mk].tx.filter(t => t.id !== editingId);
+    state.months[viewMonth].tx = state.months[viewMonth].tx.filter(t => t.id !== editingId);
     saveState();
     render();
     closeSheet();
@@ -768,7 +810,7 @@ button{font-family:inherit;}
     const delBtn = e.target.closest(".tx-del");
     if(delBtn){
       const id = delBtn.dataset.id;
-      state.months[mk].tx = state.months[mk].tx.filter(t => t.id !== id);
+      state.months[viewMonth].tx = state.months[viewMonth].tx.filter(t => t.id !== id);
       saveState();
       render();
       showToast("Movimento eliminato");
@@ -837,7 +879,7 @@ button{font-family:inherit;}
       const remote = await res.json();
       if(remote && typeof remote === "object" && (remote.updatedAt || 0) > (state.updatedAt || 0)){
         state = {income: remote.income || 0, months: remote.months || {}, updatedAt: remote.updatedAt || 0};
-        if(!state.months[mk]) state.months[mk] = {tx:[]};
+        if(!state.months[viewMonth]) state.months[viewMonth] = {tx:[]};
         saveState(false);
         render();
       }
@@ -860,7 +902,7 @@ button{font-family:inherit;}
       const remote = res.ok ? await res.json() : null;
       if(remote && (remote.updatedAt || 0) > (state.updatedAt || 0)){
         state = {income: remote.income || 0, months: remote.months || {}, updatedAt: remote.updatedAt || 0};
-        if(!state.months[mk]) state.months[mk] = {tx:[]};
+        if(!state.months[viewMonth]) state.months[viewMonth] = {tx:[]};
         saveState(false);
         render();
         showToast("Dati aggiornati da Drive");
