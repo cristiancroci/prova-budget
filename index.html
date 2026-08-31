@@ -93,6 +93,32 @@ button{font-family:inherit;}
   border:1px solid rgba(20,20,30,0.06);
   padding:6px 12px; border-radius:100px;
 }
+.sync-btn{
+  width:30px; height:30px; border-radius:100px;
+  border:1px solid rgba(20,20,30,0.06);
+  background:rgba(20,20,30,0.04);
+  color:var(--text-dim); font-size:14px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; position:relative;
+}
+.sync-btn.connected{color:var(--violet); border-color:rgba(108,92,224,0.3); background:rgba(108,92,224,0.08);}
+.sync-btn.syncing #syncIcon{animation:spin 0.9s linear infinite;}
+@keyframes spin{from{transform:rotate(0deg);} to{transform:rotate(360deg);}}
+.sync-dot{
+  position:absolute; top:-2px; right:-2px; width:8px; height:8px; border-radius:50%;
+  background:var(--danger); border:1.5px solid var(--bg2); display:none;
+}
+.sync-dot.show{display:block;}
+
+/* ---------- SYNC SHEET EXTRAS ---------- */
+.sync-status{
+  background:var(--surface2); border:1px solid var(--line);
+  border-radius:var(--radius-sm); padding:12px 14px;
+  font-size:12.5px; color:var(--text-dim); margin-bottom:14px;
+  display:flex; justify-content:space-between; align-items:center; gap:10px;
+}
+.sync-status b{color:var(--text); font-weight:600;}
+.sync-hint{font-size:11.5px; color:var(--text-dim); line-height:1.5; margin:-4px 0 14px;}
 
 .hero{
   display:flex; align-items:center; gap:20px;
@@ -350,7 +376,12 @@ button{font-family:inherit;}
       <div class="brand-mark">B</div>
       <div class="brand-name">BudgetMio</div>
     </div>
-    <div class="month-pill" id="monthPill">—</div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <button class="sync-btn" id="syncBtn" aria-label="Sincronizza con Drive" title="Sincronizza con Drive">
+        <span id="syncIcon">☁</span>
+      </button>
+      <div class="month-pill" id="monthPill">—</div>
+    </div>
   </div>
 
   <div class="hero">
@@ -428,6 +459,26 @@ button{font-family:inherit;}
   </div>
 </div>
 
+<div class="sheet-overlay" id="syncOverlay"></div>
+<div class="sheet" id="syncSheet">
+  <div class="sheet-handle"></div>
+  <h3><span>Sincronizza con Drive</span></h3>
+  <div class="sync-status" id="syncStatusBox">
+    <span id="syncStatusText">Non collegato</span>
+  </div>
+  <div class="sync-hint">
+    Incolla qui l'URL della web app di Google Apps Script (vedi istruzioni ricevute). I tuoi dati verranno salvati in un file nel tuo Drive e sincronizzati tra i dispositivi.
+  </div>
+  <div class="field">
+    <label for="syncUrlInput">URL web app Apps Script</label>
+    <input type="url" id="syncUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
+  </div>
+  <div class="sheet-actions">
+    <button class="btn btn-ghost" id="btnSyncClear">Scollega</button>
+    <button class="btn btn-primary" id="btnSyncSave">Salva e sincronizza</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -459,10 +510,12 @@ button{font-family:inherit;}
       const raw = localStorage.getItem(STORE_KEY);
       if(raw) return JSON.parse(raw);
     }catch(e){}
-    return {income:0, months:{}};
+    return {income:0, months:{}, updatedAt:0};
   }
-  function saveState(){
+  function saveState(touch){
+    if(touch !== false) state.updatedAt = Date.now();
     localStorage.setItem(STORE_KEY, JSON.stringify(state));
+    scheduleAutoSync();
   }
 
   let state = loadState();
@@ -493,7 +546,14 @@ button{font-family:inherit;}
     btnSave: document.getElementById("btnSave"),
     toast: document.getElementById("toast"),
     sortField: document.getElementById("sortField"),
-    sortDir: document.getElementById("sortDir")
+    sortDir: document.getElementById("sortDir"),
+    syncBtn: document.getElementById("syncBtn"),
+    syncOverlay: document.getElementById("syncOverlay"),
+    syncSheet: document.getElementById("syncSheet"),
+    syncUrlInput: document.getElementById("syncUrlInput"),
+    syncStatusText: document.getElementById("syncStatusText"),
+    btnSyncSave: document.getElementById("btnSyncSave"),
+    btnSyncClear: document.getElementById("btnSyncClear")
   };
 
   let activeCat = "needs";
@@ -717,6 +777,147 @@ button{font-family:inherit;}
     const row = e.target.closest(".tx-item");
     if(row) openSheetEdit(row.dataset.id);
   });
+
+  // ---------- SINCRONIZZAZIONE CON GOOGLE DRIVE (via Apps Script) ----------
+  const SYNC_URL_KEY = "budgetmio_sync_url";
+  let syncUrl = localStorage.getItem(SYNC_URL_KEY) || "";
+  let syncTimer = null;
+  let lastSyncAt = Number(localStorage.getItem("budgetmio_last_sync") || 0);
+
+  function setSyncStatus(text){
+    els.syncStatusText.innerHTML = text;
+  }
+
+  function refreshSyncUi(){
+    const connected = !!syncUrl;
+    els.syncBtn.classList.toggle("connected", connected);
+    els.syncUrlInput.value = syncUrl;
+    if(!connected){
+      setSyncStatus("Non collegato");
+    } else if(lastSyncAt){
+      const d = new Date(lastSyncAt);
+      const t = d.toLocaleTimeString("it-IT", {hour:"2-digit", minute:"2-digit"});
+      const dd = d.toLocaleDateString("it-IT", {day:"2-digit", month:"2-digit"});
+      setSyncStatus(`Collegato · ultima sync <b>${dd} ${t}</b>`);
+    } else {
+      setSyncStatus("Collegato · non ancora sincronizzato");
+    }
+  }
+
+  function setSyncing(on){
+    els.syncBtn.classList.toggle("syncing", on);
+  }
+
+  async function syncPush(){
+    if(!syncUrl) return;
+    setSyncing(true);
+    try{
+      const res = await fetch(syncUrl, {
+        method: "POST",
+        headers: {"Content-Type": "text/plain;charset=utf-8"},
+        body: JSON.stringify(state)
+      });
+      if(!res.ok) throw new Error("push failed");
+      lastSyncAt = Date.now();
+      localStorage.setItem("budgetmio_last_sync", String(lastSyncAt));
+    }catch(e){
+      showToast("Sincronizzazione non riuscita");
+    }finally{
+      setSyncing(false);
+      refreshSyncUi();
+    }
+  }
+
+  async function syncPull(){
+    if(!syncUrl) return false;
+    setSyncing(true);
+    try{
+      const res = await fetch(syncUrl, {method:"GET"});
+      if(!res.ok) throw new Error("pull failed");
+      const remote = await res.json();
+      if(remote && typeof remote === "object" && (remote.updatedAt || 0) > (state.updatedAt || 0)){
+        state = {income: remote.income || 0, months: remote.months || {}, updatedAt: remote.updatedAt || 0};
+        if(!state.months[mk]) state.months[mk] = {tx:[]};
+        saveState(false);
+        render();
+      }
+      lastSyncAt = Date.now();
+      localStorage.setItem("budgetmio_last_sync", String(lastSyncAt));
+      return true;
+    }catch(e){
+      return false;
+    }finally{
+      setSyncing(false);
+      refreshSyncUi();
+    }
+  }
+
+  async function syncNow(){
+    if(!syncUrl){ showToast("Collega prima un URL"); return; }
+    setSyncing(true);
+    try{
+      const res = await fetch(syncUrl, {method:"GET"});
+      const remote = res.ok ? await res.json() : null;
+      if(remote && (remote.updatedAt || 0) > (state.updatedAt || 0)){
+        state = {income: remote.income || 0, months: remote.months || {}, updatedAt: remote.updatedAt || 0};
+        if(!state.months[mk]) state.months[mk] = {tx:[]};
+        saveState(false);
+        render();
+        showToast("Dati aggiornati da Drive");
+      } else {
+        await fetch(syncUrl, {
+          method:"POST",
+          headers:{"Content-Type":"text/plain;charset=utf-8"},
+          body: JSON.stringify(state)
+        });
+        showToast("Dati inviati a Drive");
+      }
+      lastSyncAt = Date.now();
+      localStorage.setItem("budgetmio_last_sync", String(lastSyncAt));
+    }catch(e){
+      showToast("Sincronizzazione non riuscita");
+    }finally{
+      setSyncing(false);
+      refreshSyncUi();
+    }
+  }
+
+  function scheduleAutoSync(){
+    if(!syncUrl) return;
+    clearTimeout(syncTimer);
+    syncTimer = setTimeout(syncPush, 2200);
+  }
+
+  els.syncBtn.addEventListener("click", () => {
+    refreshSyncUi();
+    els.syncOverlay.classList.add("open");
+    els.syncSheet.classList.add("open");
+  });
+  els.syncOverlay.addEventListener("click", () => {
+    els.syncOverlay.classList.remove("open");
+    els.syncSheet.classList.remove("open");
+  });
+  els.btnSyncSave.addEventListener("click", () => {
+    const url = els.syncUrlInput.value.trim();
+    if(!url){ showToast("Incolla prima l'URL"); return; }
+    syncUrl = url;
+    localStorage.setItem(SYNC_URL_KEY, syncUrl);
+    refreshSyncUi();
+    syncNow();
+    els.syncOverlay.classList.remove("open");
+    els.syncSheet.classList.remove("open");
+  });
+  els.btnSyncClear.addEventListener("click", () => {
+    syncUrl = "";
+    localStorage.removeItem(SYNC_URL_KEY);
+    refreshSyncUi();
+    els.syncOverlay.classList.remove("open");
+    els.syncSheet.classList.remove("open");
+    showToast("Scollegato da Drive");
+  });
+
+  refreshSyncUi();
+  if(syncUrl) syncPull();
 
   render();
 
