@@ -523,6 +523,18 @@ button{font-family:inherit;}
     const d = new Date(y, m-1+delta, 1);
     return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0");
   };
+  function nearestPriorIncome(key){
+    const keys = Object.keys(state.months)
+      .filter(k => k < key && state.months[k].income != null)
+      .sort();
+    if(keys.length) return Number(state.months[keys[keys.length-1]].income) || 0;
+    return Number(state.income) || 0; // valore storico, per compatibilità con salvataggi precedenti
+  }
+  function getViewIncome(){
+    const m = state.months[viewMonth];
+    if(m && m.income != null) return Number(m.income) || 0;
+    return nearestPriorIncome(viewMonth);
+  }
   const fmt = n => "€" + (Math.round(n*100)/100).toLocaleString("it-IT", {minimumFractionDigits:2, maximumFractionDigits:2});
   const fmtShort = n => "€" + Math.round(n).toLocaleString("it-IT");
   const todayStr = () => new Date().toISOString().slice(0,10);
@@ -602,9 +614,8 @@ button{font-family:inherit;}
   function render(){
     els.monthPill.textContent = monthLabel();
     els.nextMonthBtn.disabled = (viewMonth === CURRENT_MONTH);
-    els.incomeInput.value = state.income || "";
-
-    const income = Number(state.income) || 0;
+    const income = getViewIncome();
+    els.incomeInput.value = income || "";
     const tx = (state.months[viewMonth] && state.months[viewMonth].tx) || [];
 
     const spentByCat = {needs:0, wants:0, savings:0};
@@ -697,7 +708,8 @@ button{font-family:inherit;}
 
   // events
   els.incomeInput.addEventListener("input", e => {
-    state.income = parseFloat(e.target.value) || 0;
+    if(!state.months[viewMonth]) state.months[viewMonth] = {tx:[]};
+    state.months[viewMonth].income = parseFloat(e.target.value) || 0;
     saveState();
     render();
   });
