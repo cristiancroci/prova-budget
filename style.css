@@ -395,7 +395,12 @@ body{
 }
 
 .entry-Necessità{
-  box-shadow:0 0 22px rgba(255,59,59,0.25);
+  background: conic-gradient(from 0deg, #8B7CFF, #4FA8FF, #3ECF8E, #F2A93B, #A31E33, #8B7CFF);
+  background-size: 200% 200%;
+  animation: spin 4s linear infinite;
+}
+@keyframes spin{
+  to{background-position: 200% 0%;}
 }
 
 .entry-Desideri{
